@@ -1,208 +1,72 @@
 cmake_minimum_required(VERSION 3.6)
-project(nrfdemo C ASM)
+project(main C ASM)
 
 include(CMakeForceCompiler)
 
-set(CMAKE_SYSTEM_NAME Generic)
-
-SET (CC /usr/local/bin/arm-none-eabi-gcc)
-SET (CXX /usr/local/bin/arm-none-eabi-g++)
-SET (OBJCOPY /usr/local/bin/arm-none-eabi-objcopy)
-SET (SIZE /usr/local/bin/arm-none-eabi-size)
+set (CC /usr/local/bin/arm-none-eabi-gcc)
+set (CXX /usr/local/bin/arm-none-eabi-g++)
+set (OBJCOPY /usr/local/bin/arm-none-eabi-objcopy)
+set (SIZE /usr/local/bin/arm-none-eabi-size)
 
 set(CMAKE_C_COMPILER ${CC})
 set(CMAKE_CXX_COMPILER ${CXX})
 set(CMAKE_ASM_COMPILER ${CC})
 
+set(CMAKE_SYSTEM_NAME Generic)
+
+# NRF5x Configuration
+set(NRF_SDK_ROOT /usr/local/lib/nrfsdk)
+set(NRF_FAMILY NRF52)
+include(nrfcmake.txt)
+
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_C_STANDARD 99)
-set(NRF_SDK_ROOT /nrfSDK)
-set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/blinky_gcc_nrf52.ld)
-set(TEMPLATE_PATH ${NRF_SDK_ROOT}/components/toolchain/gcc)
 
 set(SOURCE_FILES main.c
-${NRF_SDK_ROOT}/components/toolchain/gcc/gcc_startup_nrf52.S
-${NRF_SDK_ROOT}/components/toolchain/system_nrf52.c
-${NRF_SDK_ROOT}/components/libraries/util/app_error.c
-${NRF_SDK_ROOT}/components/libraries/util/app_error_weak.c
-${NRF_SDK_ROOT}/components/libraries/fifo/app_fifo.c
-${NRF_SDK_ROOT}/components/libraries/timer/app_timer.c
-${NRF_SDK_ROOT}/components/libraries/util/app_util_platform.c
-${NRF_SDK_ROOT}/components/libraries/hardfault/hardfault_implementation.c
-${NRF_SDK_ROOT}/components/libraries/util/nrf_assert.c
-${NRF_SDK_ROOT}/components/drivers_nrf/clock/nrf_drv_clock.c
-${NRF_SDK_ROOT}/components/drivers_nrf/common/nrf_drv_common.c
-${NRF_SDK_ROOT}/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c
-${NRF_SDK_ROOT}/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c)
+        ${__NRF_SOURCE_FILES}
+        ${G_NRF_SOURCE_CORE}
+)
 
 include_directories(
-./
-./bsp/
-${NRF_SDK_ROOT}/components
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_hrs_c
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_cts_c
-${NRF_SDK_ROOT}/components/drivers_nrf/comp
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_lbs
-${NRF_SDK_ROOT}/components/drivers_nrf/spi_master
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_hts
-${NRF_SDK_ROOT}/components/drivers_nrf/twi_master
-${NRF_SDK_ROOT}/components/libraries/experimental_section_vars
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_ancs_c
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_ias_c
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_hids
-${NRF_SDK_ROOT}/components/libraries/scheduler
-${NRF_SDK_ROOT}/components/drivers_nrf/pdm
-${NRF_SDK_ROOT}/components/libraries/crc32
-${NRF_SDK_ROOT}/components/drivers_nrf/delay
-${NRF_SDK_ROOT}/components/libraries/crc16
-${NRF_SDK_ROOT}/components/ble/ble_dtm
-${NRF_SDK_ROOT}/components/toolchain/cmsis/include
-${NRF_SDK_ROOT}/components/libraries/pwm
-${NRF_SDK_ROOT}/components/drivers_nrf/timer
-${NRF_SDK_ROOT}/components/libraries/util
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_rscs_c
-${NRF_SDK_ROOT}/components/drivers_nrf/uart
-${NRF_SDK_ROOT}/components/libraries/csense_drv
-${NRF_SDK_ROOT}/components/libraries/csense
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_lls
-${NRF_SDK_ROOT}/components/ble/peer_manager
-${NRF_SDK_ROOT}/components/drivers_nrf/swi
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_tps
-${NRF_SDK_ROOT}/components/libraries/mem_manager
-${NRF_SDK_ROOT}/components/libraries/hardfault
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_cscs
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_dis
-${NRF_SDK_ROOT}/components/device
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_nus
-${NRF_SDK_ROOT}/components/libraries/hci
-${NRF_SDK_ROOT}/components/libraries/log
-${NRF_SDK_ROOT}/components/drivers_nrf/spi_slave
-${NRF_SDK_ROOT}/components/libraries/mailbox
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_gls
-${NRF_SDK_ROOT}/components/libraries/slip
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_bas
-${NRF_SDK_ROOT}/components/drivers_nrf/lpcomp
-${NRF_SDK_ROOT}/components/libraries/fstorage
-${NRF_SDK_ROOT}/components/drivers_nrf/rng
-${NRF_SDK_ROOT}/components/drivers_nrf/i2s
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_ans_c
-${NRF_SDK_ROOT}/components/libraries/fifo
-${NRF_SDK_ROOT}/components/drivers_nrf/gpiote
-${NRF_SDK_ROOT}/components/drivers_nrf/saadc
-${NRF_SDK_ROOT}/components/libraries/uart
-${NRF_SDK_ROOT}/components/drivers_nrf/nrf_soc_nosd
-${NRF_SDK_ROOT}/components/toolchain
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_lbs_c
-${NRF_SDK_ROOT}/components/libraries/twi
-${NRF_SDK_ROOT}/components/drivers_nrf/hal
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_nus_c
-${NRF_SDK_ROOT}/components/ble/ble_racp
-${NRF_SDK_ROOT}/components/toolchain/gcc
-${NRF_SDK_ROOT}/components/drivers_nrf/rtc
-${NRF_SDK_ROOT}/components/libraries/fds
-${NRF_SDK_ROOT}/components/drivers_nrf/common
-${NRF_SDK_ROOT}/components/ble/ble_advertising
-${NRF_SDK_ROOT}/components/drivers_nrf/adc
-${NRF_SDK_ROOT}/components/ble/nrf_ble_qwr
-${NRF_SDK_ROOT}/components/drivers_nrf/clock
-${NRF_SDK_ROOT}/components/drivers_nrf/pwm
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_ias
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_bas_c
-${NRF_SDK_ROOT}/components/libraries/low_power_pwm
-${NRF_SDK_ROOT}/components/libraries/led_softblink
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_rscs
-${NRF_SDK_ROOT}/components/libraries/button
-${NRF_SDK_ROOT}/components/drivers_nrf/wdt
-${NRF_SDK_ROOT}/components/drivers_nrf/ppi
-${NRF_SDK_ROOT}/components/drivers_nrf/qdec
-${NRF_SDK_ROOT}/components/libraries/timer
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_dfu
-${NRF_SDK_ROOT}/components/ble/ble_services/ble_hrs
-${NRF_SDK_ROOT}/components/drivers_nrf/twis_slave
-${NRF_SDK_ROOT}/components/libraries/log/src)
+        ./
+        ./bsp/
+        ${G_NRF_INCLUDE_CORE})
 
-set(CMAKE_C_FLAGS "-DNRF52_PAN_12 \
--DNRF52_PAN_15 \
--DNRF52_PAN_58 \
--DSWI_DISABLE0 \
--DNRF52_PAN_20 \
--DNRF52_PAN_54 \
--DNRF52_PAN_31 \
--DNRF52_PAN_30 \
--DNRF52_PAN_51 \
--DNRF52_PAN_36 \
--DNRF52_PAN_53 \
--DCONFIG_GPIO_AS_PINRESET \
--DNRF52_PAN_64 \
--DNRF52_PAN_55 \
--DNRF52_PAN_62 \
--DNRF52_PAN_63 \
--DBOARD_PCA10040 \
--DNRF52 \
--DNRF52832 \
--DBSP_DEFINES_ONLY \
--mcpu=cortex-m4 \
--mthumb -mabi=aapcs \
--Wall -Werror -O3 -g3 \
--mfloat-abi=hard -mfpu=fpv4-sp-d16 \
--ffunction-sections -fdata-sections -fno-strict-aliasing \
--fno-builtin --short-enums \
--MP -MD \
--g3 -std=c99")
+set(CMAKE_C_FLAGS ${__NRF_C_FLAGS})
+set(CMAKE_ASM_FLAGS ${__NRF_ASM_FLAGS})
+set(CMAKE_EXE_LINKER_FLAGS  ${__NRF_LINKER_FLAGS})
 
-set(CMAKE_ASM_FLAGS "-x assembler-with-cpp \
--DNRF52 \
--DBOARD_PCA10040 \
--DNRF52832 \
--DNRF52_PAN_64 \
--DNRF52_PAN_12 \
--DNRF52_PAN_15 \
--DNRF52_PAN_58 \
--DNRF52_PAN_55 \
--DNRF52_PAN_54 \
--DNRF52_PAN_31 \
--DNRF52_PAN_30 \
--DNRF52_PAN_51 \
--DNRF52_PAN_36 \
--DNRF52_PAN_53 \
--DS132 \
--DCONFIG_GPIO_AS_PINRESET \
--DBLE_STACK_SUPPORT_REQD \
--DNRF_SD_BLE_API_VERSION=3 \
--DBSP_DEFINES_ONLY \
--DSWI_DISABLE0 \
--DNRF52_PAN_20 \
--DSOFTDEVICE_PRESENT \
--DNRF52_PAN_62 \
--DNRF52_PAN_63")
+add_executable(main ${SOURCE_FILES})
 
-set (CMAKE_EXE_LINKER_FLAGS  "-mthumb -mabi=aapcs -L ${TEMPLATE_PATH} -T${LINKER_SCRIPT} \
--mcpu=cortex-m4 \
--Wl,--gc-sections \
--Xlinker -Map=${CMAKE_SOURCE_DIR}/nrfdemo.map \
--mfloat-abi=hard -mfpu=fpv4-sp-d16 \
---specs=nano.specs -lc -lnosys -lm")
-
-add_executable(nrfdemo ${SOURCE_FILES})
 set_target_properties(
-        nrfdemo
+        main
         PROPERTIES
-            OUTPUT_NAME "nrf52"
+            OUTPUT_NAME "build"
             SUFFIX ".out"
 )
 
 add_custom_target(size
-        DEPENDS nrfdemo
-        COMMAND ${SIZE} nrf52.out
+        DEPENDS main
+        COMMAND ${SIZE} build.out
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_custom_target(createhex
-        DEPENDS size nrfdemo
-        COMMAND ${OBJCOPY} -O ihex nrf52.out nrf52.hex
+        DEPENDS size main
+        COMMAND ${OBJCOPY} -O ihex build.out build.hex
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_custom_target(flash
-        DEPENDS createhex size nrfdemo
-        COMMAND nrfjprog --program nrf52.hex -f nrf52 --sectorerase
-        COMMAND nrfjprog --reset -f nrf52
+        DEPENDS createhex size main
+        COMMAND nrfjprog --program build.hex -f ${__NRF_FAMILY} --sectorerase
+        COMMAND nrfjprog --reset -f ${__NRF_FAMILY}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+add_custom_target(flash_softdevice_nrf52_132_2
+        COMMAND nrfjprog --program support/s132_nrf52_2.0.1_softdevice.hex -f ${__NRF_FAMILY} --sectorerase
+        COMMAND nrfjprog --reset -f ${__NRF_FAMILY}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+add_custom_target(flash_softdevice_nrf52_132_3
+        COMMAND nrfjprog --program support/s132_nrf52_3.0.0_softdevice.hex -f ${__NRF_FAMILY} --sectorerase
+        COMMAND nrfjprog --reset -f ${__NRF_FAMILY}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
